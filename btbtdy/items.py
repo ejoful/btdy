@@ -15,7 +15,7 @@ class BtbtdyItem(scrapy.Item):
     name = scrapy.Field()
     play_time = scrapy.Field()
     update_time = scrapy.Field()
-    status = scrapy.Field()
+    quality = scrapy.Field()
     type = scrapy.Field()
     category = scrapy.Field()
     location = scrapy.Field()
@@ -23,9 +23,26 @@ class BtbtdyItem(scrapy.Item):
     imdb = scrapy.Field()
     star = scrapy.Field()
     descr = scrapy.Field()
-    pic = scrapy.Field()
+    list_pic = scrapy.Field()
+    detail_pic = scrapy.Field()
     album = scrapy.Field()
-    short_video = scrapy.Field()
+    short_video_url = scrapy.Field()
+    short_video_embed = scrapy.Field()
     subtitle = scrapy.Field()
     score = scrapy.Field()
+    url = scrapy.Field()
     # end tbl_film
+
+    # start tbl_download
+    film_id = scrapy.Field()
+    name = scrapy.Field()
+    size = scrapy.Field()
+    type = scrapy.Field()
+    download_url = scrapy.Field()
+    position = scrapy.Field()
+    url = scrapy.Field()
+
+
+
+    # end tbl_download
+
