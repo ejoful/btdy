@@ -1,1 +1,7 @@
 /bt_env
+*.pyc
+.idea/
+
+
+
+

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import scrapy
 from btbtdy.items import BtbtdyItem
 
@@ -39,7 +40,8 @@ class BtdySpider(scrapy.Spider):
             btbtdy_item['list_pic'] = video.xpath('dt/a/img/@data-src')[0].extract()
             btbtdy_item['detail_pic'] = ''
             btbtdy_item['album'] = ''
-            btbtdy_item['short_video'] = ''
+            btbtdy_item['short_video_url'] = ''
+            btbtdy_item['short_video_embed'] = ''
             btbtdy_item['subtitle'] = ''
             btbtdy_item['score'] = video.xpath("dd/p/span/text()")[0].extract()
             btbtdy_item['url'] = url
@@ -61,26 +63,80 @@ class BtdySpider(scrapy.Spider):
         btbtdy_item['descr'] = response.xpath("//div[@class='des']/div[@class='c05']/text()")[0].extract().encode('utf-8')
         btbtdy_item['detail_pic'] = response.xpath("//div[@class='vod_img lf']/img/@src")[0].extract()
         btbtdy_item['album'] = ''
-        btbtdy_item['short_video'] = ''
+        btbtdy_item['short_video_url'] = ''
+        btbtdy_item['short_video_embed'] = ''
         btbtdy_item['subtitle'] = ''
         bitt_list = response.xpath("//span[@class='bitt']/a")
         if "相关图片" in bitt_list[1].extract().encode('utf-8'):
             btbtdy_item['album'] = bitt_list[1].xpath('@href')[0].extract().encode('utf-8')
         if "字幕" in bitt_list[3].extract().encode('utf-8'):
             btbtdy_item['subtitle'] = bitt_list[3].xpath('@href')[0].extract().encode('utf-8')
-
-
+        tbd = []
+        btbtdy_item['download'] = []
+        download_list = response.xpath('//div[@class="play"]/div[@class="p_list"]')
+        for ditem in download_list[:-2]:
+            download_type = ditem.xpath("h2/text()")[0].extract()[:-4]
+            for uitem in ditem.xpath("ul[@class='p_list_02']/li"):
+                title_list = re.split('\[|\]', uitem.xpath('a/@title')[0].extract().encode('utf-8'))
+                download_name = title_list[0]
+                download_size = title_list[1]
+                download_type = ''
+                download_download_url = ''
+                download_position = ''
 
 
         if "预告片" in bitt_list[2].extract().encode('utf-8'):
             link = 'http://www.btbtdy.com'+bitt_list[2].xpath('@href')[0].extract()
             yield scrapy.Request(url=link, meta={'btbtdy_item':btbtdy_item}, callback=self.parse_short_video, dont_filter=True)
 
-    def parse_short_video(self, response):
+
+    def recursive_parse_info(self, tbd, btbtdy_item):
+        """
+        递归抓取链接
+        :param tbd: 字典类型，每个键值对存储了将要被下载的链接
+        :param btbtdy_item:
+        :return:
+        """
+        if not tbd:
+            yield btbtdy_item
+        else:
+            if tbd.has_key('trailer'):
+                link = tbd.pop('trailer')
+                yield scrapy.Request(url=link, meta={'tbd':tbd,'btbtdy_item':btbtdy_item},
+                                     callback=self.parse_trailer,
+                                     dont_filter=True)
+            elif tbd.has_key('download_links'):
+                links = tbd.pop('download_links')
+                for link in links[0:]:
+                    yield scrapy.Request(url=link,
+                                     meta={'tbd':tbd,'btbtdy_item': btbtdy_item},
+                                     callback=self.parse_download_link,
+                                     dont_filter=True)
+
+
+    def parse_trailer(self, response):
+        """
+        抓取预告片
+        :param response:
+        :return:
+        """
+        tbd = response.meta['tbd']
         btbtdy_item = response.meta['btbtdy_item']
         btbtdy_item['short_video_url'] = response.xpath("//div[@class='trailer']/span/a/@href")[0].extract()
         btbtdy_item['short_video_embed'] = response.xpath("//div[@class='trailer']/embed")[0].extract()
-        yield btbtdy_item
+        return self.recursive_parse_info(tbd, btbtdy_item)
+
+    def parse_download_link(self, response):
+        """
+        抓取下载页面
+        :param response:
+        :return:
+        """
+        tbd = response.meta['tbd']
+        btbtdy_item = response.meta['btbtdy_item']
+        btbtdy_item['short_video_url'] = response.xpath("//div[@class='trailer']/span/a/@href")[0].extract()
+        btbtdy_item['short_video_embed'] = response.xpath("//div[@class='trailer']/embed")[0].extract()
+        return self.recursive_parse_info(tbd, btbtdy_item)
 
 
 

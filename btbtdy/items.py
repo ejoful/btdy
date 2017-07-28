@@ -13,6 +13,8 @@ class BtbtdyItem(scrapy.Item):
     # name = scrapy.Field()
     # start tbl_film
     name = scrapy.Field()
+    keywords = scrapy.Field()
+    description = scrapy.Field()
     play_time = scrapy.Field()
     update_time = scrapy.Field()
     quality = scrapy.Field()
