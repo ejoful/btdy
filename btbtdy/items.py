@@ -12,6 +12,7 @@ class BtbtdyItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     # start tbl_film
+    id = scrapy.Field()
     name = scrapy.Field()
     keywords = scrapy.Field()
     description = scrapy.Field()
@@ -19,6 +20,7 @@ class BtbtdyItem(scrapy.Item):
     update_time = scrapy.Field()
     quality = scrapy.Field()
     type = scrapy.Field()
+    total_count = scrapy.Field()
     category = scrapy.Field()
     location = scrapy.Field()
     language = scrapy.Field()
@@ -36,13 +38,26 @@ class BtbtdyItem(scrapy.Item):
     # end tbl_film
 
     # start tbl_download
-    film_id = scrapy.Field()
-    name = scrapy.Field()
-    size = scrapy.Field()
-    type = scrapy.Field()
-    download_url = scrapy.Field()
-    position = scrapy.Field()
-    url = scrapy.Field()
+    download = scrapy.Field()
+    """
+    BtbtdyItem['download'] = [
+    {'film_id':'','name':'','size':'','format':'','number':'','type':'','magnet_url':'','xiaomi_url':'','xunlei_url':'','position':'','url':''},
+    {'film_id':'','name':'','size':'','format':'','number':'','type':'','magnet_url':'','xiaomi_url':'','xunlei_url':'','position':'','url':''},
+    ...
+                             ]
+    film_id = film id
+    name = film name
+    size = film size
+    format = film format, hdrip,btray
+    number = film number
+    type = 720p 1080p
+    magnet_url = magnet url
+    xiaomi_url = xiaomi route url
+    xunlei_url = xunlei url
+    position = position
+    url = download page link
+    """
+
 
 
 
