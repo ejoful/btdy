@@ -7,6 +7,11 @@
 
 import scrapy
 
+class Btdy_masterItem(scrapy.Item):
+    id = scrapy.Field()
+
+
+
 
 class BtbtdyItem(scrapy.Item):
     # define the fields for your item here like:

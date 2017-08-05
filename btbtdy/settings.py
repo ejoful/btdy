@@ -68,7 +68,8 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
     # 'btbtdy.pipelines.BtbtdyPipeline': 300,
     # 'btbtdy.pipelines.JsonWriterPipeline': 300,
-    'btbtdy.pipelines.MysqlPipeline': 600,
+    'btbtdy.pipelines.MysqlPipeline': 300,
+    'scrapy_redis.pipelines.RedisPipeline': 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -113,3 +114,7 @@ USER_AGENTS = [
 
 LOG_FILE = "log.txt"
 # LOG_LEVEL = "INFO"
+
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+SCHEDULER_PERSIST = True
