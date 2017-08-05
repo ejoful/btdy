@@ -2,7 +2,7 @@
 import redis
 
 
-def insert(str, type):
+def insert(type, str):
     try:
         r = redis.Redis(host='127.0.0.1', port=6379, db=0)
     except:
@@ -11,4 +11,4 @@ def insert(str, type):
         if type == 'start_urls':
             r.lpush('btbtdy:start_urls', str)
         elif type == 'detail_links':
-            r.lpush('btbtdy:detail_links', str)
+            r.lpush('btbtdy:detail_links2', str)

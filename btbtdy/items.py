@@ -7,8 +7,9 @@
 
 import scrapy
 
-class Btdy_masterItem(scrapy.Item):
-    id = scrapy.Field()
+class Btdy_slaveItem(scrapy.Item):
+    title = scrapy.Field()
+    url = scrapy.Field()
 
 
 
