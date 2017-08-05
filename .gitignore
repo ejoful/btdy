@@ -1,7 +1,7 @@
 /bt_env
 *.pyc
 .idea/
-
+*log.txt
 
 
 
