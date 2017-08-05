@@ -30,6 +30,7 @@ class BtbtdyItem(scrapy.Item):
     list_pic = scrapy.Field()
     detail_pic = scrapy.Field()
     album = scrapy.Field()
+    short_video_title = scrapy.Field()
     short_video_url = scrapy.Field()
     short_video_embed = scrapy.Field()
     subtitle = scrapy.Field()
