@@ -11,7 +11,7 @@ class BtdySpider(scrapy.Spider):
 
     def start_requests(self):
         reqs = []
-        for i in range(1,312):
+        for i in range(1,2):
             req = scrapy.Request("http://www.btbtdy.com/screen/1-----time-%s.html"%i)
             reqs.append(req)
         return reqs

@@ -11,39 +11,46 @@ class BtdySlaveSpider(RedisSpider):
     def parse(self, response):
         btbtdy_item = BtbtdyItem()
         btbtdy_item['id'] = re.findall(r"\d+", response.url)[0]
-        btbtdy_item['name'] = ''
+        detail = response.xpath("//div[@class='vod_intro rt']")
+        btbtdy_item['name'] = detail.xpath("h1/text()")[0].extract().encode('utf-8')
         btbtdy_item['keywords'] = response.xpath("//meta[@name='keywords']/@content")[0].extract().encode('utf-8')
         btbtdy_item['description'] = response.xpath("//meta[@name='description']/@content")[0].extract().encode('utf-8')
-        btbtdy_item['play_time'] = ''
-        detail = response.xpath("//div[@class='vod_intro rt']")
+        year_str = detail.xpath("h1/span[@class='year']/text()")[0].extract().encode('utf-8')
+        btbtdy_item['play_time'] = re.findall(r"\d+", year_str)[0]
         btbtdy_item['update_time'] = detail.xpath('dl/dd[1]/text()')[0].extract()+':00'
         btbtdy_item['quality'] = detail.xpath('dl/dd[2]/text()')[0].extract().encode('utf-8')
         btbtdy_item['type'] = detail.xpath('dl/dd[3]/a/text()')[0].extract().encode('utf-8')
+        btbtdy_item['total_count'] = 1
         if '电视剧' in btbtdy_item['type']:
             total_count_list = btbtdy_item['quality'].split(',')
-            btbtdy_item['total_count'] = re.findall(r"\d+", total_count_list[0])[0]
+            btbtdy_item['total_count'] = re.findall(r"\d+", total_count_list[1])[0]
         category_list = detail.xpath('dl/dd[3]/a/text()')[1:].extract()
         btbtdy_item['category'] = ','.join(category_list).encode('utf-8')
         btbtdy_item['location'] = detail.xpath('dl/dd[4]/a/text()')[0].extract().encode('utf-8')
         btbtdy_item['language'] = detail.xpath('dl/dd[5]/a/text()')[0].extract().encode('utf-8')
+        btbtdy_item['imdb'] = ''
         if detail.xpath('dl/dd[6]/a/text()'):
             btbtdy_item['imdb'] = detail.xpath('dl/dd[6]/a/text()')[0].extract().encode('utf-8')
         zhuyan_list = detail.xpath('dl/dd[7]/a/text()').extract()
         btbtdy_item['star'] = ','.join(zhuyan_list).encode('utf-8')
         btbtdy_item['descr'] = ''.join(response.xpath("//div[@class='des']/div[@class='c05']/p").extract()).encode('utf-8')
-        btbtdy_item['list_pic'] = ''
+        detail_pic = response.xpath("//div[@class='vod_img lf']/img/@src")[0].extract().encode('utf-8')
+        btbtdy_item['list_pic'] = detail_pic.split('?')[0]+'?h=190'
         btbtdy_item['detail_pic'] = response.xpath("//div[@class='vod_img lf']/img/@src")[0].extract().encode('utf-8')
         bitt_list = response.xpath("//span[@class='bitt']/a")
+        btbtdy_item['album'] = ''
         if "相关图片" in bitt_list[1].extract().encode('utf-8'):
             btbtdy_item['album'] = bitt_list[1].xpath('@href')[0].extract().encode('utf-8')
         btbtdy_item['short_video_url'] = ''
         btbtdy_item['short_video_embed'] = ''
+        btbtdy_item['subtitle'] = ''
         if "字幕" in bitt_list[3].extract().encode('utf-8'):
             btbtdy_item['subtitle'] = bitt_list[3].xpath('@href')[0].extract().encode('utf-8')
-        btbtdy_item['score'] = ''
+        btbtdy_item['score'] = 1.0
         btbtdy_item['url'] = response.url
         btbtdy_item['download'] = []
         tbd = {'download_links':[]}
+
         download_list = response.xpath('//div[@class="play"]/div[@class="p_list"]')
         testditem = download_list[0]
         testuitem = testditem.xpath("ul[@class='p_list_02']/li")

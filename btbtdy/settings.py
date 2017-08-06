@@ -68,7 +68,7 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
     # 'btbtdy.pipelines.BtbtdyPipeline': 300,
     # 'btbtdy.pipelines.JsonWriterPipeline': 300,
-    # 'btbtdy.pipelines.MysqlPipeline': 300,
+    'btbtdy.pipelines.MysqlPipeline': 300,
     'scrapy_redis.pipelines.RedisPipeline': 400,
 }
 
@@ -114,7 +114,8 @@ USER_AGENTS = [
 
 LOG_FILE = "log.txt"
 # LOG_LEVEL = "INFO"
+# LOG_LEVEL = "ERROR"
 
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
-SCHEDULER_PERSIST = False
+SCHEDULER_PERSIST = True

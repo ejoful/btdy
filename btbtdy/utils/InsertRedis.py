@@ -11,4 +11,4 @@ def insert(type, str):
         if type == 'start_urls':
             r.lpush('btbtdy:start_urls', str)
         elif type == 'detail_links':
-            r.lpush('btbtdy:detail_links2', str)
+            r.lpush('btbtdy:detail_links', str)

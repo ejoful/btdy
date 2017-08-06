@@ -47,7 +47,7 @@ class MysqlPipeline(object):
             db='btbtdy',
             host='127.0.0.1',
             user='root',
-            passwd='',
+            passwd='moon',
             cursorclass=MySQLdb.cursors.DictCursor,
             charset='utf8',
             use_unicode=True)
@@ -63,10 +63,10 @@ class MysqlPipeline(object):
         # create recode if doesn't exist.
         # all this block run on it's own thread
 
-        tx.execute("select * from `tbl_film` where `id` = %s", (item['id']))
+        tx.execute("select * from `tbl_film` where `id` = %s" % (item['id']))
         result = tx.fetchone()
         if result:
-            logging.log(logging.DEBUG, "Item already stored in db: %s" % item)
+            logging.log(logging.DEBUG, "Item already stored in db: %s" % (item['id']))
         else:
             sql = """INSERT INTO `tbl_film` (
 `id`,`name`,`keywords`, `description`,`play_time`,`update_time`,
@@ -74,7 +74,7 @@ class MysqlPipeline(object):
 `imdb`,`star`,`descr`,`list_pic`,`detail_pic`,`album`,
 `short_video_url`, `short_video_embed`, `subtitle`,`score`,`url`) VALUES (
  %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
- %s,%s,%s,%s,%s, %s,%s,%s,%s,%s,%s,%s,%s)"""
+ %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
             lis = (
                     item['id'],item['name'], item['keywords'], item['description'],item['play_time'],item['update_time'],
                     item['quality'], item['type'], item['total_count'], item['category'],item['location'], item['language'],
@@ -86,7 +86,7 @@ class MysqlPipeline(object):
                 sql = """INSERT INTO `tbl_download` (
 `film_id`,`name`,`size`,`format`,`number`,`type`,
 `magnet_url`,`xiaomi_url`,`xunlei_url`,`position`,`url`) 
-VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+VALUES (%s,%s,%s,%s,%s, %s,%s,%s,%s,%s, %s)"""
                 download = (le['film_id'], le['name'], le['size'], le['format'],
                             le['number'], le['type'],
                             le['magnet_url'], le['xiaomi_url'],
