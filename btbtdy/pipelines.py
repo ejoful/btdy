@@ -44,8 +44,8 @@ class MysqlPipeline(object):
 
         self.dbpool = adbapi.ConnectionPool(
             'MySQLdb',
-            db='btbtdy',
-            host='127.0.0.1',
+            db='new_btbtdy',
+            host='localhost',
             user='root',
             passwd='moon',
             cursorclass=MySQLdb.cursors.DictCursor,
@@ -82,7 +82,12 @@ class MysqlPipeline(object):
                     item['short_video_url'], item['short_video_embed'],item['subtitle'], item['score'], item['url'])
             tx.execute(sql,lis)
 
-            for le in item['download']:
+        for le in item['download']:
+            tx.execute("select * from `tbl_download` where `url` = '%s'" % (le['url']))
+            result = tx.fetchone()
+            if result:
+                logging.log(logging.DEBUG, "Item already stored in db: %s" % (le['url']))
+            else:
                 sql = """INSERT INTO `tbl_download` (
 `film_id`,`name`,`size`,`format`,`number`,`type`,
 `magnet_url`,`xiaomi_url`,`xunlei_url`,`position`,`url`) 

@@ -9,7 +9,7 @@ class BtdyMasterSpider(RedisSpider):
 
     def start_requests(self):
         reqs = []
-        for i in range(1,313):
+        for i in range(1, 320):
             req = scrapy.Request("http://www.btbtdy.com/screen/0-----time-%s.html"%i)
             reqs.append(req)
         return reqs

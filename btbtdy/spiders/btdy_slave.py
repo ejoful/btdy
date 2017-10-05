@@ -51,10 +51,10 @@ class BtdySlaveSpider(RedisSpider):
         btbtdy_item['download'] = []
         tbd = {'download_links':[]}
 
-        download_list = response.xpath('//div[@class="play"]/div[@class="p_list"]')
+        download_list = response.xpath('//div[@id="nucms_downlist"]/div[@class="p_list"]')
         testditem = download_list[0]
         testuitem = testditem.xpath("ul[@class='p_list_02']/li")
-        for ditem in download_list[:-2]:
+        for dindex, ditem in enumerate(download_list):
             for uindex, uitem in enumerate(ditem.xpath("ul[@class='p_list_02']/li")):
                 dlink = {'film_id': btbtdy_item['id'], 'name': '',
                                  'size': '','format': '', 'number': '',
@@ -72,22 +72,17 @@ class BtdySlaveSpider(RedisSpider):
                 dlink['type'] = ditem.xpath("h2/text()")[0].extract()[:-4].encode('utf-8')
                 dlink['ed2k_url'] = ''
                 dlink['magnet_url'] = ''
-                if uitem.xpath('span/a[@class="d4"]/@href'):
-                    #ed2k link
-                    dlink['ed2k_url'] = uitem.xpath('span/a[@class="d4"]/@href')[0].extract().encode('utf-8')
-                if uitem.xpath('span/a[@class="d1"]/@href'):
-                    #磁力 link
-                    dlink['magnet_url'] = uitem.xpath('span/a[@class="d1"]/@href')[0].extract().encode('utf-8')
                 dlink['xiaomi_url'] = ''
                 dlink['xunlei_url'] = ''
                 dlink['position'] = uindex
-                dlink['url'] = 'http://www.btbtdy.com'+uitem.xpath('a/@href')[0].extract().encode('utf-8')
+                # print(btbtdy_item['url'])
+                # print(uitem.xpath('a/@href')[0].extract().encode('utf-8'))
+                dlink['url'] = 'http://www.btbtdy.com/down/'+str(btbtdy_item['id'])+'-'+str(dindex)+'-'+str(uindex)+'.html'
                 tbd['download_links'].append(dlink)
 
         if "预告片" in bitt_list[2].extract().encode('utf-8'):
             link = 'http://www.btbtdy.com'+bitt_list[2].xpath('@href')[0].extract().encode('utf-8')
             tbd['trailer'] = link
-
         return self.recursive_parse_info(tbd, btbtdy_item)
 
 
@@ -98,22 +93,25 @@ class BtdySlaveSpider(RedisSpider):
         :param btbtdy_item:
         :return:
         """
-        if not tbd:
-            yield btbtdy_item
+        # if not tbd:
+        #     print(btbtdy_item)
+        #     yield btbtdy_item
+        # else:
+        if tbd.has_key('trailer'):
+            link = tbd.pop('trailer')
+            yield scrapy.Request(url=link, meta={'tbd':tbd,'btbtdy_item':btbtdy_item},
+                                 callback=self.parse_trailer,
+                                 dont_filter=True)
+        if len(tbd['download_links']) == 0:
+            tbd.pop('download_links')
+            # print(btbtdy_item['url'])
         else:
-            if tbd.has_key('trailer'):
-                link = tbd.pop('trailer')
-                yield scrapy.Request(url=link, meta={'tbd':tbd,'btbtdy_item':btbtdy_item},
-                                     callback=self.parse_trailer,
-                                     dont_filter=True)
-            if len(tbd['download_links']):
-                dlink = tbd['download_links'].pop(0)
-                if len(tbd['download_links']) == 0:
-                    tbd.pop('download_links')
-                yield scrapy.Request(url=dlink['url'],
-                                     meta={'tbd':tbd,'dlink':dlink, 'btbtdy_item':btbtdy_item},
-                                     callback=self.parse_download_link,
-                                     dont_filter=True)
+            dlink = tbd['download_links'].pop(0)
+            yield scrapy.Request(url=dlink['url'],
+                                 meta={'tbd':tbd,'dlink':dlink, 'btbtdy_item':btbtdy_item},
+                                 callback=self.parse_download_link,
+                                 dont_filter=True)
+        yield btbtdy_item
 
     def parse_trailer(self, response):
         """
@@ -140,7 +138,16 @@ class BtdySlaveSpider(RedisSpider):
         tbd = response.meta['tbd']
         dlink = response.meta['dlink']
         btbtdy_item = response.meta['btbtdy_item']
-        dlink['xiaomi_url'] = response.xpath("//td/a[@id='d2r']/@href")[0].extract().encode('utf-8')
-        dlink['xunlei_url'] = response.xpath("//td/a[@id='xunlei']/@href")[0].extract().encode('utf-8')
+        if response.xpath('//input[@id="text1"]/@value'):
+            # 磁力 link
+            dlink['magnet_url'] = response.xpath('//input[@id="text1"]/@value')[0].extract().encode('utf-8')
+        if response.xpath("//td/a[@id='d2r']/@href"):
+            dlink['xiaomi_url'] = response.xpath("//td/a[@id='d2r']/@href")[0].extract().encode('utf-8')
+        if response.xpath("//td/a[@id='xunlei']/@href"):
+            dlink['xunlei_url'] = response.xpath("//td/a[@id='xunlei']/@href")[0].extract().encode('utf-8')
+        for tditem in response.xpath("//forum[@id='form2']/table/tr/td"):
+            item = tditem.xpath("a/@href")
+            if item and item[0].extract().encode('utf-8').find('ed2k:') != -1:
+                dlink['ed2k_url'] = item[0].extract().encode('utf-8')
         btbtdy_item['download'].append(dlink)
         return self.recursive_parse_info(tbd, btbtdy_item)
