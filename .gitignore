@@ -1,6 +1,6 @@
 /bt_env
 *.pyc
-.idea/
+.idea/*
 
 
 
