@@ -120,3 +120,5 @@ LOG_LEVEL = "ERROR"
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 SCHEDULER_PERSIST = True
+
+REDIS_URL = 'redis://10.1.194.229:6379'
