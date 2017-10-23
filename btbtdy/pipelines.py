@@ -10,7 +10,6 @@ import logging
 from twisted.enterprise import adbapi
 import MySQLdb.cursors
 
-
 class BtbtdyPipeline(object):
     def process_item(self, item, spider):
         return item
@@ -44,10 +43,10 @@ class MysqlPipeline(object):
 
         self.dbpool = adbapi.ConnectionPool(
             'MySQLdb',
-            db='new_btbtdy',
+            db='btbtdy1',
             host='localhost',
             user='root',
-            passwd='moon',
+            passwd='',
             cursorclass=MySQLdb.cursors.DictCursor,
             charset='utf8',
             use_unicode=True)

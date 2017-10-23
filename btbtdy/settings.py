@@ -69,7 +69,7 @@ ITEM_PIPELINES = {
     # 'btbtdy.pipelines.BtbtdyPipeline': 300,
     # 'btbtdy.pipelines.JsonWriterPipeline': 300,
     'btbtdy.pipelines.MysqlPipeline': 300,
-    'scrapy_redis.pipelines.RedisPipeline': 400,
+    'scrapy_redis.pipelines.RedisPipeline': 10,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -117,6 +117,10 @@ LOG_FILE = "log.txt"
 # LOG_LEVEL = "INFO"
 LOG_LEVEL = "ERROR"
 
-DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 SCHEDULER_PERSIST = True
+# Redis设置
+REDIS_URL = 'redis://10.1.194.229:6379'
+

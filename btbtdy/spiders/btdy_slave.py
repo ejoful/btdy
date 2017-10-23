@@ -23,11 +23,18 @@ class BtdySlaveSpider(RedisSpider):
         btbtdy_item['total_count'] = 1
         if '电视剧' in btbtdy_item['type']:
             total_count_list = btbtdy_item['quality'].split(',')
-            btbtdy_item['total_count'] = re.findall(r"\d+", total_count_list[1])[0]
+            if re.findall(r"\d+", total_count_list[1]):
+                btbtdy_item['total_count'] = re.findall(r"\d+", total_count_list[1])[0]
         category_list = detail.xpath('dl/dd[3]/a/text()')[1:].extract()
         btbtdy_item['category'] = ','.join(category_list).encode('utf-8')
-        btbtdy_item['location'] = detail.xpath('dl/dd[4]/a/text()')[0].extract().encode('utf-8')
-        btbtdy_item['language'] = detail.xpath('dl/dd[5]/a/text()')[0].extract().encode('utf-8')
+        if detail.xpath('dl/dd[4]/a/text()'):
+            btbtdy_item['location'] = detail.xpath('dl/dd[4]/a/text()')[0].extract().encode('utf-8')
+        else:
+            btbtdy_item['location'] = ''
+        if detail.xpath('dl/dd[5]/a/text()'):
+            btbtdy_item['language'] = detail.xpath('dl/dd[5]/a/text()')[0].extract().encode('utf-8')
+        else:
+            btbtdy_item['language'] = ''
         btbtdy_item['imdb'] = ''
         if detail.xpath('dl/dd[6]/a/text()'):
             btbtdy_item['imdb'] = detail.xpath('dl/dd[6]/a/text()')[0].extract().encode('utf-8')
@@ -52,8 +59,8 @@ class BtdySlaveSpider(RedisSpider):
         tbd = {'download_links':[]}
 
         download_list = response.xpath('//div[@id="nucms_downlist"]/div[@class="p_list"]')
-        testditem = download_list[0]
-        testuitem = testditem.xpath("ul[@class='p_list_02']/li")
+        # testditem = download_list[0]
+        # testuitem = testditem.xpath("ul[@class='p_list_02']/li")
         for dindex, ditem in enumerate(download_list):
             for uindex, uitem in enumerate(ditem.xpath("ul[@class='p_list_02']/li")):
                 dlink = {'film_id': btbtdy_item['id'], 'name': '',
@@ -101,7 +108,7 @@ class BtdySlaveSpider(RedisSpider):
             link = tbd.pop('trailer')
             yield scrapy.Request(url=link, meta={'tbd':tbd,'btbtdy_item':btbtdy_item},
                                  callback=self.parse_trailer,
-                                 dont_filter=True)
+                                 dont_filter=False)
         if len(tbd['download_links']) == 0:
             tbd.pop('download_links')
             # print(btbtdy_item['url'])
@@ -110,7 +117,7 @@ class BtdySlaveSpider(RedisSpider):
             yield scrapy.Request(url=dlink['url'],
                                  meta={'tbd':tbd,'dlink':dlink, 'btbtdy_item':btbtdy_item},
                                  callback=self.parse_download_link,
-                                 dont_filter=True)
+                                 dont_filter=False)
         yield btbtdy_item
 
     def parse_trailer(self, response):
