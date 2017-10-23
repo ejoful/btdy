@@ -112,10 +112,10 @@ USER_AGENTS = [
   "Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto/2.9.168 Version/11.52",
 ]
 
-LOG_FILE = "log.txt"
+# LOG_FILE = "log.txt"
 # LOG_LEVEL = "WARNING"
 # LOG_LEVEL = "INFO"
-LOG_LEVEL = "ERROR"
+# LOG_LEVEL = "ERROR"
 
 
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"

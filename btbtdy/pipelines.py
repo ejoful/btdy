@@ -43,8 +43,8 @@ class MysqlPipeline(object):
 
         self.dbpool = adbapi.ConnectionPool(
             'MySQLdb',
-            db='btbtdy1',
-            host='localhost',
+            db='new_btbtdy1',
+            host='10.1.194.229',
             user='root',
             passwd='',
             cursorclass=MySQLdb.cursors.DictCursor,
