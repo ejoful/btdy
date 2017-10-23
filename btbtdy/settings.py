@@ -124,3 +124,4 @@ SCHEDULER_PERSIST = True
 # Redis设置
 REDIS_URL = 'redis://10.1.194.229:6379'
 
+
